@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* Single dark theme — the GringX hero. Colours estimated from the Figma hero
+   (node 551:451); confirm exact hex against the spec when available. */
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  --muted: #8b90a0; /* body copy, stat labels, eyebrow */
+  --border: #24262f; /* navbar pills, divider line */
+  --accent: #7c9cfe; /* brand blue — "Contact Us" status dot */
+
+  /* responsive raw values (bound to Tailwind tokens in @theme below — the
+     names differ on purpose, a token can't reference itself). Desktop values
+     read off the 1440 Figma hero (node 551:451); tablet/mobile steps keep the
+     type from dwarfing the smaller viewports since the rem grid re-bases. */
+  --fs-hero: 4.5rem; /* "Turn data into decisions" — 72px, wraps to 2 lines */
+  --fs-stat: 2rem; /* stat numbers (4.9 / 15k / …) */
+  --inset-edge: 1.875rem; /* 30px — hero content inset */
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --fs-hero: 3.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --fs-hero: 2.75rem;
+    --fs-stat: 1.75rem;
+    --inset-edge: 1.25rem;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+
+  /* preloader (intro splash) — bespoke colours, tokenised */
+  --color-preloader-curtain: #0a1633; /* dark-blue exit curtain */
+  --color-preloader-bar: #0d1424; /* progress-bar dark backing */
+  --color-preloader-outline: #1b2540; /* decorative outline */
+  --color-preloader-fill-a: #0055ff; /* gradient fill — left (#05F) */
+  --color-preloader-fill-b: #000e39; /* gradient fill — right */
+
+  /* type + spacing tokens — bound to the responsive :root values above, so
+     `text-hero` / `text-stat` / `px-edge` adapt per breakpoint with no
+     responsive prefixes in markup */
+  --text-hero: var(--fs-hero);
+  --text-stat: var(--fs-stat);
+  --spacing-edge: var(--inset-edge);
+
+  --font-sans: var(--font-mulish);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+@layer base {
+  /* Adaptive scaling grid — the root font-size tracks the viewport so a
+     rem-based layout stays proportional to the 1440 Figma design. `1.111111vw`
+     (= 16 * 100 / 1440) is the design base: 1rem = 16px at exactly 1440, and it
+     scales UP above 1440 and down to 1024, so every rem element keeps the same
+     share of the viewport as in Figma. Tablet/mobile drop to their own base
+     widths. Keep in sync with src/components/common/grid/grid.config.ts. */
+  html {
+    font-size: 1.111111vw; /* 16 * 100 / 1440 — the design base */
+  }
+
+  @media (max-width: 1024px) {
+    html {
+      font-size: 1.5625vw; /* 16 * 100 / 1024 */
+    }
+  }
+
+  @media (max-width: 640px) {
+    html {
+      font-size: 4.444444vw; /* 16 * 100 / 360 */
+    }
+  }
+}
+
+@layer utilities {
+}
+
+@layer components {
+}
