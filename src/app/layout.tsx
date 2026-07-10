@@ -34,7 +34,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="preload" href="/assets/hands.glb" as="fetch" crossOrigin="anonymous" />
-        <link rel="preload" href="/assets/icon.glb" as="fetch" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/eagle-logo.png" as="image" />
         <link rel="preload" href="/draco/draco_decoder.wasm" as="fetch" crossOrigin="anonymous" />
         <link rel="preload" href="/draco/draco_wasm_wrapper.js" as="script" />
       </head>

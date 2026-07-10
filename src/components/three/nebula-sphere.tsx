@@ -5,20 +5,22 @@ import { useEffect, useRef } from "react";
 import {
   AmbientLight,
   Box3,
-  Color,
+  CanvasTexture,
   CubeCamera,
   DirectionalLight,
-  Group,
   LinearMipmapLinearFilter,
   Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
   Object3D,
   PerspectiveCamera,
+  PlaneGeometry,
   PointLight,
   Raycaster,
   Scene,
   ShaderMaterial,
   SphereGeometry,
+  TextureLoader,
   Vector2,
   Vector3,
   WebGLCubeRenderTarget,
@@ -45,7 +47,7 @@ const HANDS_URL = "/assets/hands.glb";
 const HANDS_SCALE = 1.72;
 const HANDS_POSITION = new Vector3(0, 0, 0);
 const HANDS_FLY_DISTANCE = 4; // hands-local units each hand starts off-screen
-const LOGO_URL = "/assets/icon.glb";
+const LOGO_URL = "/assets/eagle-logo.png";
 // --- camera / parallax ---
 const CAMERA_Z = 3;
 const PARALLAX_LERP = 0.06; // how fast the camera eases toward the pointer
@@ -212,35 +214,43 @@ export const NebulaSphere = ({ config, className }: NebulaSphereProps) => {
       }));
     });
 
-    // ---- the logo — a 3D model (DRACO glb) embedded in the orb centre, metallic ----
-    const logoMaterial = new MeshStandardMaterial({
+    const logoGeometry = new PlaneGeometry(1, 1);
+    const logoMaterial = new MeshBasicMaterial({
+      transparent: true,
+      depthWrite: false,
       color: init.logo.color,
-      metalness: init.logo.metalness,
-      roughness: init.logo.roughness,
-      emissive: new Color(init.logo.emissive),
-      emissiveIntensity: init.logo.emissiveIntensity,
-      envMap: cubeRT.texture,
-      envMapIntensity: 1.2,
+      opacity: 0,
     });
-    let logo: Object3D | null = null;
-    let logoFit = 1; // 1/maxDim — normalises the mark to 1 unit before logo.scale
-    gltfLoader.load(LOGO_URL, (gltf) => {
-      const icon = gltf.scene;
-      icon.traverse((o) => {
-        const mesh = o as Mesh;
-        if (mesh.isMesh) mesh.material = logoMaterial;
-      });
-      const box = new Box3().setFromObject(icon);
-      const size = box.getSize(new Vector3());
-      icon.position.sub(box.getCenter(new Vector3())); // centre the mark at origin
-      logoFit = 1 / Math.max(size.x, size.y, size.z);
+    const logo = new Mesh(logoGeometry, logoMaterial);
+    scene.add(logo);
 
-      // wrap so we can scale + position + lookAt() the whole thing each frame
-      logo = new Group();
-      logo.add(icon);
-      scene.add(logo);
+    new TextureLoader().load(LOGO_URL, (texture) => {
+      const image = texture.image as HTMLImageElement;
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth || image.width;
+      canvas.height = image.naturalHeight || image.height;
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const data = context.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < data.data.length; i += 4) {
+        const r = data.data[i];
+        const g = data.data[i + 1];
+        const b = data.data[i + 2];
+        data.data[i + 3] = Math.max(r, g, b);
+      }
+      context.putImageData(data, 0, 0);
+
+      const alphaTexture = new CanvasTexture(canvas);
+      alphaTexture.minFilter = texture.minFilter;
+      alphaTexture.magFilter = texture.magFilter;
+      logoMaterial.map = alphaTexture;
+      logoMaterial.alphaMap = alphaTexture;
+      logoMaterial.opacity = 1;
+      logoMaterial.needsUpdate = true;
+      texture.dispose();
     });
-
     // ---- bloom compositor (the orb's glow) ----
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
@@ -327,10 +337,6 @@ export const NebulaSphere = ({ config, className }: NebulaSphereProps) => {
       handsMaterial.metalness = cfg.hands.metalness;
       handsMaterial.envMapIntensity = cfg.hands.envMapIntensity;
       logoMaterial.color.set(cfg.logo.color);
-      logoMaterial.metalness = cfg.logo.metalness;
-      logoMaterial.roughness = cfg.logo.roughness;
-      logoMaterial.emissive.set(cfg.logo.emissive);
-      logoMaterial.emissiveIntensity = cfg.logo.emissiveIntensity;
       glow.color.set(cfg.glowColor);
       bloom.strength = cfg.bloomStrength;
       sphere.scale.setScalar(cfg.sphereScale);
@@ -372,11 +378,9 @@ export const NebulaSphere = ({ config, className }: NebulaSphereProps) => {
 
       // the embedded logo: centred in the orb (following the bob), poking toward
       // the camera by `depth`, billboarded to face it, sized to fit.
-      if (logo) {
-        logo.scale.setScalar(cfg.logo.scale * logoFit);
-        logo.position.set(0, sphere.position.y, cfg.logo.depth);
-        logo.lookAt(camera.position);
-      }
+      logo.scale.set(cfg.logo.scale * 1.7, cfg.logo.scale * 1.7, 1);
+      logo.position.set(0, sphere.position.y, cfg.logo.depth);
+      logo.lookAt(camera.position);
 
       // hands fly-in: top hand from above, bottom from below, settling into rest
       // with a *critically-damped spring* rather than a time-eased curve. Solved
@@ -399,10 +403,10 @@ export const NebulaSphere = ({ config, className }: NebulaSphereProps) => {
       // reflection less often than the screen frame.
       if (frame % REFLECTION_FRAME_INTERVAL === 0) {
         if (hands) hands.visible = false;
-        if (logo) logo.visible = false;
+        logo.visible = false;
         cubeCamera.update(renderer, scene);
         if (hands) hands.visible = true;
-        if (logo) logo.visible = true;
+        logo.visible = true;
       }
       frame += 1;
 
@@ -426,12 +430,9 @@ export const NebulaSphere = ({ config, className }: NebulaSphereProps) => {
         });
       }
       handsMaterial.dispose();
-      if (logo) {
-        logo.traverse((o) => {
-          const mesh = o as Mesh;
-          if (mesh.isMesh) mesh.geometry.dispose();
-        });
-      }
+      logoGeometry.dispose();
+      logoMaterial.map?.dispose();
+      logoMaterial.alphaMap?.dispose();
       logoMaterial.dispose();
       draco.dispose();
       cubeRT.dispose();
