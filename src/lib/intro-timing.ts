@@ -7,7 +7,7 @@
 // --- preloader ---
 export const PRELOADER_LOAD_MS = 650; // progress bar 0 to 100
 export const PRELOADER_WHITE_EXIT_MS = 360; // white curtain lifts
-export const PRELOADER_DARK_EXIT_MS = 520; // dark-blue curtain lifts (trails)
+export const PRELOADER_DARK_EXIT_MS = 520; // black-pink curtain lifts (trails)
 
 // --- hero DOM entrances: start as the curtains lift ---
 export const HERO_REVEAL_DELAY = PRELOADER_LOAD_MS + 180; // ~830

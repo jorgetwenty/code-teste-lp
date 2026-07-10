@@ -37,10 +37,10 @@ export interface NebulaConfig {
 
 export const DEFAULT_NEBULA_CONFIG: NebulaConfig = {
   colDeep: "#000000",
-  colNebula: "#001eff",
-  colBright: "#858dff",
-  colHot: "#006eff",
-  colStar: "#000000",
+  colNebula: "#ff1f8f",
+  colBright: "#ff9ccc",
+  colHot: "#ff4fa3",
+  colStar: "#ffd6ea",
   nebulaScale: 2.4,
   flowSpeed: 0.295,
   starDensity: 0.85,
@@ -126,11 +126,11 @@ export const DEFAULT_SCENE_CONFIG: SceneConfig = {
   bloomStrength: 0.19,
   parallaxAmplitude: 0.79,
   levitationAmplitude: 0.08,
-  glowColor: "#7c9cfe",
+  glowColor: "#ff4fa3",
   centerDarken: 0.37,
   centerSize: 0.44,
   hands: {
-    color: "#b8b8ff",
+    color: "#ffb3d3",
     roughness: 0.31,
     metalness: 0.83,
     envMapIntensity: 2.25,

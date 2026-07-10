@@ -5,9 +5,9 @@
 :root {
   --background: #000000;
   --foreground: #ffffff;
-  --muted: #8b90a0; /* body copy, stat labels, eyebrow */
-  --border: #24262f; /* navbar pills, divider line */
-  --accent: #7c9cfe; /* brand blue — "Contact Us" status dot */
+  --muted: #b39aa8; /* body copy, stat labels, eyebrow */
+  --border: #33242d; /* navbar pills, divider line */
+  --accent: #ff4fa3; /* brand pink — "Contact Us" status dot */
 
   /* responsive raw values (bound to Tailwind tokens in @theme below — the
      names differ on purpose, a token can't reference itself). Desktop values
@@ -40,11 +40,11 @@
   --color-accent: var(--accent);
 
   /* preloader (intro splash) — bespoke colours, tokenised */
-  --color-preloader-curtain: #0a1633; /* dark-blue exit curtain */
-  --color-preloader-bar: #0d1424; /* progress-bar dark backing */
-  --color-preloader-outline: #1b2540; /* decorative outline */
-  --color-preloader-fill-a: #0055ff; /* gradient fill — left (#05F) */
-  --color-preloader-fill-b: #000e39; /* gradient fill — right */
+  --color-preloader-curtain: #12000b; /* black-pink exit curtain */
+  --color-preloader-bar: #160711; /* progress-bar dark backing */
+  --color-preloader-outline: #3a1c2d; /* decorative outline */
+  --color-preloader-fill-a: #ff4fa3; /* gradient fill — left pink */
+  --color-preloader-fill-b: #2a0019; /* gradient fill — right */
 
   /* type + spacing tokens — bound to the responsive :root values above, so
      `text-hero` / `text-stat` / `px-edge` adapt per breakpoint with no

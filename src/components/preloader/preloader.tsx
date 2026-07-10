@@ -15,7 +15,7 @@ import {
  * gradient fill that grows 0→100% as it "loads", an animated counter, and a
  * decorative outline equidistant around it, all on a white layer. State 2 (exit):
  * the white layer slides up (carrying + clipping the bar) and, behind it, a
- * dark-blue layer slides up at a different speed, revealing the app. Unmounts
+ * black-pink layer slides up at a different speed, revealing the app. Unmounts
  * when gone. All motion is `@react-spring/web` (no CSS keyframes); the hero
  * reveals + hand fly-in are timed off the same [[intro-timing]] constants.
  */
@@ -57,7 +57,7 @@ export const Preloader = () => {
       aria-label="Loading"
       className="fixed inset-0 z-[60] overflow-hidden"
     >
-      {/* dark-blue curtain — behind the white, revealed as the white lifts */}
+      {/* black-pink curtain — behind the white, revealed as the white lifts */}
       <animated.div
         className="absolute inset-0 bg-preloader-curtain"
         style={dark}
